@@ -29,6 +29,7 @@ class PMSP:
         self.setup_list = list()
 
         self.done = False
+        self.action_history = {"SSPT": 0, "ATCS": 0, "MDD": 0, "COVERT": 0}
         self.time = 0
         self.reward_setup = 0
         self.reward_tard = 0
@@ -39,6 +40,7 @@ class PMSP:
         done = False
         self.previous_time_step = self.sim_env.now
         routing_rule = self.mapping[action]
+        self.action_history[routing_rule] += 1
 
         self.routing.decision.succeed(routing_rule)
         self.routing.indicator = False
@@ -106,6 +108,7 @@ class PMSP:
 
         self.sim_env, self.model, self.source, self.sink, self.routing, self.monitor = self._modeling()
         self.done = False
+        self.action_history = {"SSPT": 0, "ATCS": 0, "MDD": 0, "COVERT": 0}
         self.reward_setup = 0
         self.reward_tard = 0
         self.monitor.reset()

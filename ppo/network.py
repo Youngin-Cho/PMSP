@@ -18,12 +18,13 @@ class Network(nn.Module):
         self.actor = nn.Linear(n_units, action_size)
         self.critic = nn.Linear(n_units, 1)
 
-    def act(self, state, mask, greedy=False):
+    def act(self, state, mask, T, greedy=False):
         x = F.elu(self.fc1(state))
         x = F.elu(self.fc2(x))
         x = F.elu(self.fc3(x))
 
         logits = self.actor(x)
+        logits = logits / T
         logits[~mask] = float('-inf')
         dist = Categorical(logits=logits)
 
@@ -41,12 +42,13 @@ class Network(nn.Module):
 
         return action.detach(), action_logprob.detach(), state_value.detach()
 
-    def evaluate(self, batch_state, batch_action, batch_mask):
+    def evaluate(self, batch_state, batch_action, batch_mask, T):
         x = F.elu(self.fc1(batch_state))
         x = F.elu(self.fc2(x))
         x = F.elu(self.fc3(x))
 
         batch_logits = self.actor(x)
+        batch_logits = batch_logits / T
         batch_logits[~batch_mask] = float('-inf')
 
         batch_dist = Categorical(logits=batch_logits)

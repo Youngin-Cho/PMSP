@@ -30,6 +30,7 @@ class Agent:
         self.gamma = args.gamma
         self.eps_clip = args.eps_clip
         self.K_epoch = args.K_epoch
+        self.T = args.T
         self.V_coef = args.V_coef
         self.E_coef = args.E_coef
 
@@ -44,7 +45,7 @@ class Agent:
         mask = torch.from_numpy(mask).bool().to(device)
 
         with torch.no_grad():
-            action, action_logprob, state_value = self.policy.act(state, mask)
+            action, action_logprob, state_value = self.policy.act(state, mask, self.T)
 
         if train:
             return action.item(), action_logprob.item(), state_value.item()
@@ -76,7 +77,7 @@ class Agent:
         advantages = n_step_returns.detach() - old_state_values.detach()
 
         for _ in range(self.K_epoch):
-            logprobs, state_values, dist_entropy = self.policy.evaluate(old_states, old_actions, old_masks)
+            logprobs, state_values, dist_entropy = self.policy.evaluate(old_states, old_actions, old_masks, self.T)
 
             ratios = torch.exp(logprobs - old_logprobs.unsqueeze(1).detach())
             surr1 = ratios * advantages.unsqueeze(1)

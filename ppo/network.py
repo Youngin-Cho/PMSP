@@ -18,7 +18,7 @@ class Network(nn.Module):
         self.actor = nn.Linear(n_units, action_size)
         self.critic = nn.Linear(n_units, 1)
 
-    def act(self, state, mask, T, greedy=False):
+    def act(self, state, mask, T=1.0, greedy=False):
         x = F.elu(self.fc1(state))
         x = F.elu(self.fc2(x))
         x = F.elu(self.fc3(x))
